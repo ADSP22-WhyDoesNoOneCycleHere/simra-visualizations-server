@@ -1,3 +1,7 @@
+rdp
+geopy
+gpxpy
+psycopg2
 alabaster==0.7.12
 alembic==1.4.2
 appdirs==1.4.4
@@ -13,7 +17,7 @@ bleach==3.1.5
 blinker==1.4
 Brotli==1.0.7
 CacheControl==0.12.6
-cairocffi==1.2.0
+cairocffi==1.0.0
 certifi==2018.1.18
 cffi==1.14.1
 chardet==3.0.4
@@ -109,7 +113,6 @@ progress==1.5
 prometheus-client==0.8.0
 prompt-toolkit==3.0.6
 psutil==5.7.2
-psycopg2==2.8.5
 ptyprocess==0.6.0
 pyasn1==0.4.8
 pycairo==1.19.1
@@ -128,7 +131,7 @@ pyrsistent==0.16.0
 python-dateutil==2.8.1
 python-debian==0.1.32
 python-editor==1.0.4
-python-magic==0.4.16
+python-magic
 python-memcached==1.59
 python-mimeparse==1.6.0
 pytoml==0.1.21
