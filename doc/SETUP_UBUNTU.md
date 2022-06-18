@@ -172,7 +172,7 @@ sudo apt install -y default-jdk
 sudo java -jar ./graphhopper/graphhopper-web-5.3.jar server ./graphhopper/config.yml
 ```
 
-_Notice: Starting the service can take a while as it will create a graph inside `graph-cache/`._
+4. **Make sure the server has completely started before populating the db. This may take a while as it will create a graph inside `graph-cache/`.**
 
 
 ## Initial database population
@@ -188,9 +188,7 @@ sudo wget "https://github.com/omniscale/imposm3/releases/download/v0.10.0/imposm
 tar -xf imposm-0.10.0-linux-x86-64.tar.gz # unpack
 ```
 
-2. Download a mapping.yml from our slack chat ???
-
-3. Execute Imposm
+2. Execute Imposm
 ```
 sudo ./imposm-0.10.0-linux-x86-64/imposm import -mapping mapping.yml -read "/var/simra/pbf/berlin-latest.osm.pbf" -overwritecache -write -connection postgis://simra:simra12345simra@localhost/simra
 ```
