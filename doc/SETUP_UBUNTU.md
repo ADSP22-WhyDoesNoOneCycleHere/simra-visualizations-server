@@ -1,41 +1,54 @@
-- [Setup on Ubuntu Linux](#setup-on-ubuntu-linux)
+- [Setup on Ubuntu18.04.5](#setup-on-ubuntu18.04)
   - [Python](#python)
   - [PostgreSQL Database](#postgresql-database)
-  - [Setup Mapnik and tirex](#setup-mapnik-and-tirex)
-  - [Setup apache2](#setup-apache2)
-  - [Setup mod_tile](#setup-mod_tile)
-  - [Django & Python](#django--python)
+  - [Django](#django)
   - [Graphhopper](#graphhopper)
   - [Initial database population](#initial-database-population)
   - [Run the importer](#run-the-importer)
-  - [Rendering Map Tiles](#rendering-map-tiles)
-- [List of known issues](#list-of-known-issues)
 
 # Setup on Ubuntu Linux
 
-Latest update: 13.06.2021
+1. Generally execute all commands from inside the main directory unless stated otherwise
 
-This guide describes the project setup for Ubuntu 18.04. If you have a clean setup OS you can also try running the `util/ubuntu-setup.sh` script which should do all the steps described here automatically.
+2. Make sure all your packages are up to date.
 
-Make sure all your packages are up to date with `sudo apt update`.
+```
+sudo apt update -y && sudo apt upgrade -y
+```
 
 ## Python
 
-Install Python 3.8 and python development headers: `sudo apt install python3.8 python3.8-dev`
-
-`python3.8 --version` should return `Python 3.8.10` now.
-
-Now, change the `python` command to point towards `python3.8` instead of python 2:
-
+1. Install Python 3.8 and python development headers: 
 ```
-update-alternatives --remove python /usr/bin/python2
-sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.8 10
+sudo apt install -y python3.8 python3.8-dev
 ```
 
-Now, to install pip for python 3.8, first execute `sudo apt remove python-pip` to remove existing pip versions. Then check, whether pip is no longer installed (`pip --version`).
 
-Next, install pip for Python 3.6 via `sudo apt install python3-pip` (`pip3 --version`) and then install pip for Python 3.8 by using pip: `python -m pip install pip`. Last, set your `~/.local/bin/` directory in the `PATH` variable. To do so, open `~./bashrc` (or your respective shell configuration file) and paste the following at the end of the file:
+2. Change the python command to point towards Python 3.8 instead of Python 2:
+```
+sudo update-alternatives --remove python /usr/bin/python2
+```
+```
+sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.8 10 # sets Python3.8 as default Python
+```
 
+
+3. Install pip for python 3.8
+```
+sudo apt remove python-pip  # removes existing pip version
+```
+```
+pip --version # returns module not installed
+```
+```
+sudo apt install -y python3-pip  # installs pip for Python 3.6
+```
+```
+python -m pip install pip # installs pip for Python 3.8
+```
+
+
+4. After that, set your `~/.local/bin/` directory in the `PATH` variable. To do so, open `~./bashrc` (or your respective shell configuration file) and paste the following at the end of the file:
 ```
 # set PATH so it includes user's private bin if it exists
 if [ -d "$HOME/.local/bin" ] ; then
@@ -43,47 +56,179 @@ if [ -d "$HOME/.local/bin" ] ; then
 fi
 ```
 
-Now restart the terminal or execute `source ~/.bashrc` and check whether the installation was successful with `pip --version` which should return XYZ.
+5. Now restart the terminal or execute `source ~/.bashrc` and check whether the installation was successful with `pip --version` which should return some pip version.
 
 (Steps taken from [this](https://stackoverflow.com/questions/63207385/how-do-i-install-pip-for-python-3-8-on-ubuntu-without-changing-any-defaults) tutorial.)
 
-Lastly, start django by executing `python manage.py runserver` in the `api/` directory.
-
-Python packages which have to be installed after (TODO: Add to requirements.txt):
-
-- `rdp`
-- `geopy`
-- `gpxpy`
 
 ## PostgreSQL Database
 
-Install the database via `sudo apt install postgresql postgresql-contrib`. `psql --version`. should return `10.17`.
+1. Install Postgres && Postgis
+```
+sudo apt install -y postgresql postgresql-contrib
+```
+```
+sudo apt install -y postgis
+```
 
-The following lines create a new database user `simra` and a database of the same name. To do so we use the default psql user `postgres` who has superadmin access to the entire PostgreSQL instance.
 
+2. Start the server (**Different on WSL**) and setup the user and database
+```
+sudo systemctl start postgresql.service # (When on WSL use "sudo service postgresql start" instead)**
+```
 ```
 sudo -u postgres createuser simra
+```
+```
 sudo -u postgres createdb simra
 ```
-
-Next, enter the psql command line interface as the user `postgres` to allocate a password to the new `simra` user:
-
 ```
-sudo -u postgres psql
-psql=# alter user simra with encrypted password 'simra';
-psql=# grant all privileges on database simra to simra;
-psql=# alter role simra superuser;
+sudo -u postgres psql # enters psql as user postgres
 ```
 
-The CLI should return `ALTER ROLE` and `GRANT` as visual feedback when both operations where successful. You can also check whether the database was created by typing `\list` into the psql CLI which will list all databases.
+3. Execute the following commands in psql:
+```
+psql=# alter user simra with encrypted password 'simra12345simra';  # ALTER ROLE
+psql=# grant all privileges on database simra to simra; # GRANT
+psql=# alter role simra superuser;  # ALTER ROLE
+psql=# create extension postgis; # CREATE EXTENSION
+psql=# select PostGIS_full_version();  # yields version 2.4.3.Log out	
+```	
 
-To quit the CLI, type `\q` and press enter.
+3. To quit the CLI, type `\q` and press enter. (2x)
 
 (The steps above where taken from [this](https://medium.com/coding-blocks/creating-user-database-and-adding-access-on-postgresql-8bfcd2f4a91e) tutorial.)
 
-Install postgis via `sudo apt install postgis`. Next, you need to log into the database as the `postgres` user and activate PostGIS by executing `CREATE EXTENSION postgis;`. The `SELECT PostGIS_full_version();` should yield version 2.4.3.Log out again.
-
 We recommend the tool pgAdmin4 for managing the PostgreSQL database because it allows for geo data visualization. It can be installed, following [this tutorial](https://www.pgadmin.org/download/pgadmin-4-apt/).
+
+
+
+## Django
+_Notice: At this point the Postgres server should be running._ 
+
+Now that the database is set up, we will create database models which will define the form of the database tables which will be filled later. For that, the project uses the django framework.
+
+1. Install django
+```
+pip install django
+```
+
+2. Install some packages needed to install the other required packages
+```
+sudo apt install -y libgpgme-dev python-apt python3-testresources
+```
+```
+sudo apt-get install -y libpq-dev python-dev pkg-config libcairo2-dev
+```
+```
+sudo apt-get install -y libffi6 libffi-dev swig
+```
+
+3. Install all packages of requirement.txt
+```
+pip install -r requirements.txt # installs other needed packages
+```
+
+4. Navigate into the `api/` directory (if necessary, remove `SimRaAPI/migrations/`) and run:
+
+```
+python manage.py makemigrations SimRaAPI
+```
+```
+python manage.py migrate
+```
+```
+python manage.py runserver
+```
+
+5. Navigate back to the parent folder (`cd ..`)
+
+
+## Graphhopper
+
+This component is used to determine the shortest routes between two GPS coordinates as well as to map match the raw GPS data onto a map
+
+1. Download the Graphhopper web server
+
+```
+sudo wget https://github.com/graphhopper/graphhopper/releases/download/5.3/graphhopper-web-5.3.jar -P ./graphhopper/
+```
+
+2. Download street map data for Berlin and DACH-Region (we really only use Berlin but the DACH data is used in graphhopper.conf atm)
+```
+sudo mkdir -p /var/simra/pbf
+```
+```
+sudo wget https://download.geofabrik.de/europe/germany/berlin-latest.osm.pbf -P /var/simra/pbf/
+```
+```
+sudo wget https://download.geofabrik.de/europe/dach-latest.osm.pbf -P /var/simra/pbf/
+```
+
+3. Install java and start the web server:
+
+```
+sudo apt install default-jdk
+```
+```
+sudo java -jar ./graphhopper/graphhopper-web-5.3.jar server ./graphhopper/config.yml
+```
+
+_Notice: Starting the service can take a while as it will create a graph inside `graph-cache/`._
+
+
+## Initial database population
+_Notice: At this point the Postgres server, the Django server and the Graphhopper server should be running._ 
+
+We use the tool [Imposm](https://imposm.org/docs/imposm3/latest/) to fill our database with basic map data from the OSM database.
+
+1. Install Imposm
+```
+sudo wget "https://github.com/omniscale/imposm3/releases/download/v0.10.0/imposm-0.10.0-linux-x86-64.tar.gz"
+```
+```
+tar -xf imposm-0.10.0-linux-x86-64.tar.gz # unpack
+```
+
+2. Download a mapping.yml from our slack chat ???
+
+3. Execute Imposm
+```
+sudo ./imposm-0.10.0-linux-x86-64/imposm import -mapping mapping.yml -read "/var/simra/pbf/berlin-latest.osm.pbf" -overwritecache -write -connection postgis://simra:simra12345simra@localhost/simra
+```
+
+This created the schema `import` with the table `osm_ways` which is used in the next step by the `create_legs.py` script.
+
+
+## Run the importer
+_Notice: At this point the Postgres server, the Django server and the Graphhopper server should be running._ 
+
+Next, the existing map data is separated into legs which represent single street segments of the street network. 
+
+1. Execute importer/importer/create_legs.py to fill the database tables `OsmWaysLegs`, `OsmWaysJunctions` and `OsmWaysLargeJunctions` inside the schema `public` of the `simra` database.
+```
+python importer/importer/create_legs.py
+```
+
+2. Execute importer/importer/import.py to import the CSV data into the database. 
+**Attention, depending on the amount of data which is imported, this process can take a while. To test if your setup is working we highly recommend to test with a small amount of CSV files.**
+```
+python importer/importer/import.py
+```
+
+
+
+### Everything after this has not been updated!
+
+## Setup apache2
+
+Install the web server by executing `sudo apt install apache2 apache2-dev`. Checking the status of the server with `systemctl status apache2` should yield `active (running)`. If not, start the web server manually via `sudo systemctl start apache2`.
+
+Now copy `simra-ubuntu.conf` into `/etc/apache2/mods-available`: `sudo cp ./tileserver/config/simra-ubuntu.conf /etc/apache2/mods-available`. Next we system link the config file to `/etc/apache2/mods-enabled`: `sudo ln -s /etc/apache2/mods-available/simra-ubuntu.conf /etc/apache2/mods-enabled`. Apache2 will automatically look into these directories and read those configurations. Lastly restart the service via `sudo systemctl restart apache2`.
+
+## Setup mod_tile
+
+This package is a module for the Apache web server. If not done yet, add the OSM PPA to the OS: `sudo add-apt-repository -y ppa:osmadmins/ppa`. Now the installation is possible straight forward by executing `sudo apt-get install -y libapache2-mod-tile`. Lastly execute `sudo ln -s /var/lib/tirex/tiles /var/lib/mod_tile` to create a system link.
 
 ## Setup Mapnik and tirex
 
@@ -167,75 +312,7 @@ In your `mapnik_config/` directory change the `mapfile` variable to point toward
 
 Now you can start the Tirex services: `sudo systemctl start tirex-master` and `sudo systemctl start tirex-backend-manager`.
 
-## Setup apache2
 
-Install the web server by executing `sudo apt install apache2 apache2-dev`. Checking the status of the server with `systemctl status apache2` should yield `active (running)`. If not, start the web server manually via `sudo systemctl start apache2`.
-
-Now copy `simra-ubuntu.conf` into `/etc/apache2/mods-available`: `sudo cp ./tileserver/config/simra-ubuntu.conf /etc/apache2/mods-available`. Next we system link the config file to `/etc/apache2/mods-enabled`: `sudo ln -s /etc/apache2/mods-available/simra-ubuntu.conf /etc/apache2/mods-enabled`. Apache2 will automatically look into these directories and read those configurations. Lastly restart the service via `sudo systemctl restart apache2`.
-
-## Setup mod_tile
-
-This package is a module for the Apache web server. If not done yet, add the OSM PPA to the OS: `sudo add-apt-repository -y ppa:osmadmins/ppa`. Now the installation is possible straight forward by executing `sudo apt-get install -y libapache2-mod-tile`. Lastly execute `sudo ln -s /var/lib/tirex/tiles /var/lib/mod_tile` to create a system link.
-
-## Django & Python
-
-Now that the database is set up, we will create database models which will define the form of the database tables which will be filled later. For that, the project uses the django framework which can be installed with pip: `pip install django`.
-
-Then, execute `pip install -r requirements.txt`. This will run in an error which can be resolved by downgrading the `libpq5` package and installing some more dependencies:
-
-```
-sudo apt install libgpgme-dev python-apt python3-testresources
-sudo apt-get install libpq-dev python-dev pkg-config libcairo2-dev
-sudo apt-get install libpq5=10.17-0ubuntu0.18.04.1
-sudo apt-get install libpq-dev python-dev
-pip install psycopg2
-```
-
-TODO: Can the apt-get commands be executed together?
-
-Now run `pip install -r requirements.txt` again.
-
-_Attention!_ `mapnik==3.0.23` was removed from `requirements.txt`. TODO: Put back in there?
-
-Navigate into the `api/` directory (if necessary, remove `SimRaAPI/migrations/`) and run:
-
-```
-python manage.py makemigrations SimRaAPI
-python manage.py migrate
-```
-
-## Graphhopper
-
-This component is used to determine the shortest routes between two GPS coordinates as well as to map match the raw GPS data onto a map.
-
-```
-# Download the Graphhopper web server
-wget https://graphhopper.com/public/releases/graphhopper-web-3.0.jar -P ./graphhopper/
-
-# Download street map data for DACH (Germany, Austria, Switzerland)
-sudo mkdir /var/simra /var/simra/pbf
-sudo wget http://download.geofabrik.de/europe/dach-latest.osm.pbf -P /var/simra/pbf/
-```
-
-If not done yet, install Java on your system: `sudo apt install default-jdk`.
-
-Now start the web server by executing `java -jar ./graphhopper/graphhopper-web-3.0.jar server ./graphhopper/config.yml`. **Make sure this service is running before importing any GPS data.** TODO: Make `start.sh` executable: You can also use the startup script provided in the same folder. To do so, give it execution permission by calling `chmod +x ./graphhopper/start.sh`. Now you can start the Graphhopper web server via `./graphhopper/start.sh`.
-
-_Notice: Starting the service can take a while as it will create a graph inside `graph-cache/`._
-
-## Initial database population
-
-Now the PostgreSQL database gets filled with basic map data, retrieved by the OSM service. To do so, we use the tool [Imposm](https://imposm.org/docs/imposm3/latest/).
-
-Navigate into the `osm importer` directory and execute `sudo ./imposm-0.10.0-linux-x86-64/imposm import -mapping mapping.yml -read "berlin-latest.osm.pbf" -overwritecache -write -connection postgis://simra:simra12345simra@localhost/simra`. This creates the schema `import` with the table `osm_ways` which is used in the next step by the `create_legs.py` script.
-
-## Run the importer
-
-Next, the existing map data is separated into legs which represent single street segments of the street network. To do that, execute `python importer/importer/create_legs.py`. This will fill the database tables `OsmWaysLegs`, `OsmWaysJunctions` and `OsmWaysLargeJunctions` inside the schema `public` of the `simra` database.
-
-Execute `python importer/importer/import.py`. This will import the CSV data into the database.
-
-Attention, depending on the amount of data which is imported, this process can take a while. To test if your setup is working we highly recommend to test with a small amount of CSV files.
 
 ## Rendering Map Tiles
 
