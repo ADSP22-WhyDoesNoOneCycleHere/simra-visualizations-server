@@ -129,7 +129,7 @@ sudo apt-get install -y libffi6 libffi-dev swig
 pip install -r requirements.txt # installs other needed packages
 ```
 
-4. Run 'api/manage.py' (if necessary, remove `api/SimRaAPI/migrations/`):
+4. Run `api/manage.py` (if necessary, remove `api/SimRaAPI/migrations/`):
 
 ```
 python api/manage.py makemigrations SimRaAPI
