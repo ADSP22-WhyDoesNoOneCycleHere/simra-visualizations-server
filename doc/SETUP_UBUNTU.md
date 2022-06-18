@@ -163,8 +163,7 @@ sudo wget https://download.geofabrik.de/europe/germany/berlin-latest.osm.pbf -P 
 sudo wget https://download.geofabrik.de/europe/dach-latest.osm.pbf -P /var/simra/pbf/
 ```
 
-3. Install java and start the web server:
-
+3. Install java and start the web server (Error handling in Step 5):
 ```
 sudo apt install -y default-jdk
 ```
@@ -173,6 +172,12 @@ sudo java -jar ./graphhopper/graphhopper-web-5.3.jar server ./graphhopper/config
 ```
 
 4. **Make sure the server has completely started before populating the db. This may take a while as it will create a graph inside `graph-cache/`.**
+
+5. If you encounter a Java heap exception, you need to give java more RAM to start the server
+```
+export JAVA_OPTS="-Xmx10g -Xms10g"  # This gives java a minimum and maximum of 10gigs ram.
+```
+5.1. Delete the graph-cache/ directory and start the server again.
 
 
 ## Initial database population
