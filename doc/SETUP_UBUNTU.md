@@ -129,22 +129,16 @@ sudo apt-get install -y libffi6 libffi-dev swig
 pip install -r requirements.txt # installs other needed packages
 ```
 
-4. Navigate into the `api/` directory (if necessary, remove `SimRaAPI/migrations/`) and run:
+4. Run 'api/manage.py' (if necessary, remove `api/SimRaAPI/migrations/`):
 
 ```
-cd api
+python api/manage.py makemigrations SimRaAPI
 ```
 ```
-python manage.py makemigrations SimRaAPI
+python api/manage.py migrate
 ```
 ```
-python manage.py migrate
-```
-```
-python manage.py runserver
-```
-```
-cd ..
+python api/manage.py runserver
 ```
 
 
@@ -172,7 +166,7 @@ sudo wget https://download.geofabrik.de/europe/dach-latest.osm.pbf -P /var/simra
 3. Install java and start the web server:
 
 ```
-sudo apt install default-jdk
+sudo apt install -y default-jdk
 ```
 ```
 sudo java -jar ./graphhopper/graphhopper-web-5.3.jar server ./graphhopper/config.yml
