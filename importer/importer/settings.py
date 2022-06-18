@@ -6,7 +6,7 @@ logging.basicConfig(
 )
 
 # The directory to import the SimRa generated CSV files from.
-IMPORT_DIRECTORY = "/home/sfuehr/Documents/TUB-WI/S7_BA_SimRa/Monitored_CSV_Data"
+IMPORT_DIRECTORY = "importer/resources"
 
 # PostgreSQL database connection parameters.
 DB_HOST = "127.0.0.1"
