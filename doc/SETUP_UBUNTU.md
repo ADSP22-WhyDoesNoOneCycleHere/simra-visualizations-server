@@ -74,7 +74,7 @@ sudo apt install -y postgis
 
 2. Start the server (**Different on WSL**) and setup the user and database
 ```
-sudo systemctl start postgresql.service # (When on WSL use "sudo service postgresql start" instead)**
+sudo systemctl start postgresql.service # (When on WSL use "sudo service postgresql start" instead)
 ```
 ```
 sudo -u postgres createuser simra
@@ -132,6 +132,9 @@ pip install -r requirements.txt # installs other needed packages
 4. Navigate into the `api/` directory (if necessary, remove `SimRaAPI/migrations/`) and run:
 
 ```
+cd api
+```
+```
 python manage.py makemigrations SimRaAPI
 ```
 ```
@@ -140,8 +143,9 @@ python manage.py migrate
 ```
 python manage.py runserver
 ```
-
-5. Navigate back to the parent folder (`cd ..`)
+```
+cd ..
+```
 
 
 ## Graphhopper
