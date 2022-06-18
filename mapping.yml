@@ -1,0 +1,11 @@
+tables:
+  ways:
+    type: linestring
+    mapping:
+      highway: [__any__]
+    columns:
+      - {name: osm_id, type: id}
+      - {name: geometry, type: geometry}
+      - {key: name, name: street_name, type: string}
+      - {key: postal_code, name: postal_code, type: string}
+      - {name: highway_type, type: mapping_value}
