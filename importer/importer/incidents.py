@@ -12,7 +12,7 @@ def handle_incidents(data, filename, cur):
     for row in data:
         rideTimestamp = datetime.utcfromtimestamp(int(row.get("ts", 0) or 0) / 1000)
         temp_bikeType = row.get("bike", -1)
-        if isinstance(temp_bikeType, Integer):
+        if isinstance(temp_bikeType, int):
             bikeType = temp_bikeType
         else:
             bikeType = 0
@@ -20,7 +20,7 @@ def handle_incidents(data, filename, cur):
         childCheckbox = row.get("childCheckBox", 0) == "1"
         trailerCheckbox = row.get("trailerCheckBox", 0) == "1"
         temp_pLoc = row.get("pLoc", -1)
-        if isinstance(temp_pLoc, Integer):
+        if isinstance(temp_pLoc, int):
             pLoc = temp_pLoc
         else:
             pLoc = 0
