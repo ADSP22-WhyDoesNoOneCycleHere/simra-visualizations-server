@@ -88,14 +88,22 @@ sudo -u postgres psql # enters psql as user postgres
 
 3. Execute the following commands in psql:
 ```
-psql=# alter user simra with encrypted password 'simra12345simra';  # ALTER ROLE
-psql=# grant all privileges on database simra to simra; # GRANT
-psql=# alter role simra superuser;  # ALTER ROLE
-psql=# create extension postgis; # CREATE EXTENSION
-psql=# select PostGIS_full_version();  # yields version 2.4.3.Log out	
+alter user simra with encrypted password 'simra12345simra';
+```
+```
+grant all privileges on database simra to simra;
+```
+```
+alter role simra superuser;
+```
+```
+create extension postgis;
+```
+```
+select PostGIS_full_version();
 ```	
 
-3. To quit the CLI, type `\q` and press enter. (2x)
+4. To quit the CLI, type `\q` and press enter. (2x)
 
 (The steps above where taken from [this](https://medium.com/coding-blocks/creating-user-database-and-adding-access-on-postgresql-8bfcd2f4a91e) tutorial.)
 
