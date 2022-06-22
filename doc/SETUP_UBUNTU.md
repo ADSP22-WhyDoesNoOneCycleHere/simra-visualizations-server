@@ -219,7 +219,7 @@ Next, the existing map data is separated into legs which represent single street
 python importer/importer/create_legs.py
 ```
 
-2. Execute importer/importer/import.py to import the CSV data into the database. 
+2. Execute importer/importer/import.py to import the CSV data into the database. This will import all files that are in subdirectories of importer/resources
 **Attention, depending on the amount of data which is imported, this process can take a while. To test if your setup is working we highly recommend to test with a small amount of CSV files.**
 ```
 python importer/importer/import.py
