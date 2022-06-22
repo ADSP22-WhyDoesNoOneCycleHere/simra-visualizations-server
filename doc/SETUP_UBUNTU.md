@@ -206,7 +206,7 @@ tar -xf imposm-0.10.0-linux-x86-64.tar.gz # unpack
 sudo ./imposm-0.10.0-linux-x86-64/imposm import -mapping mapping.yml -read "/var/simra/pbf/berlin-latest.osm.pbf" -overwritecache -write -connection postgis://simra:simra12345simra@localhost/simra
 ```
 
-This created the schema `import` with the table `osm_ways` which is used in the next step by the `create_legs.py` script.
+This created the schema `import` with the table `osm_ways` which is used in the next step by the `create_legs.py` script. Then we import the csv data into our database.
 
 
 ## Run the importer
