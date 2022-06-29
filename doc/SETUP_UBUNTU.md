@@ -48,7 +48,7 @@ python -m pip install pip # installs pip for Python 3.8
 ```
 
 
-4. After that, set your `~/.local/bin/` directory in the `PATH` variable. To do so, open `~./bashrc` (or your respective shell configuration file) and paste the following at the end of the file:
+4. After that, set your `~/.local/bin/` directory in the `PATH` variable. To do so, open `~/.bashrc` (or your respective shell configuration file) and paste the following at the end of the file:
 ```
 # set PATH so it includes user's private bin if it exists
 if [ -d "$HOME/.local/bin" ] ; then
