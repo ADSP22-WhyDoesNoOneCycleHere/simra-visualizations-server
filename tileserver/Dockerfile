@@ -37,7 +37,7 @@ RUN cd tirex && make
 RUN cd tirex && make install
 
 # Fetch & install mod_tile
-RUN git clone -b switch2osm git://github.com/SomeoneElseOSM/mod_tile.git
+RUN git clone -b switch2osm https://github.com/SomeoneElseOSM/mod_tile.git
 # Symlink the mason packages path because mod_tile ""assumes"" only the travis CI wants to build from source...
 RUN /bin/bash -c 'mkdir -p /home/travis/build/mapbox/mason/ && ln -s /mapnik/mason_packages /home/travis/build/mapbox/mason/mason_packages'
 RUN cd mod_tile && ./autogen.sh
@@ -61,7 +61,7 @@ RUN chown tirex:tirex -R /etc/tirex /var/lib/tirex /var/run/tirex /var/log/tirex
 
 # Configure mod_tile
 RUN ln -s /var/lib/tirex/tiles /var/lib/mod_tile
-COPY ./config/tile.conf /etc/apache2/conf-enabled/
+COPY ./config/simra-ubuntu.conf /etc/apache2/conf-enabled/
 
 EXPOSE 80
 
