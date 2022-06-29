@@ -2,6 +2,8 @@ __pycache__/
 csvdata/*
 *.zip
 build/
+.DS_store
+simra.sql.gz
 
 # IDE settings
 .idea
