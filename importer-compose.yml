@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  db: 
+    container_name: db
+    image: postgis/postgis
+    restart: always
+    environment: 
+      POSTGRES_USER: simra
+      POSTGRES_PASSWORD: simra12345simra
+      POSTGRES_DB: simra
+
+  adminer:
+    container_name: adminer
+    image: adminer
+    restart: always
+    ports:
+      - "9090:8080"
+
+  graph-hopper: 
+    build: ./graphhopper/docker
+    container_name: graph-hopper
+    ports:
+      - "8989:8989"
+      - "8990:8990"
+
+  django:
+    build: ./api
+    container_name: django
+    ports:
+      - "8000:8000" 
+
+
+
+    
