@@ -160,18 +160,7 @@ This component is used to determine the shortest routes between two GPS coordina
 sudo wget https://github.com/graphhopper/graphhopper/releases/download/5.3/graphhopper-web-5.3.jar -P ./graphhopper/
 ```
 
-2. Download street map data for Berlin and DACH-Region (we really only use Berlin but the DACH data is used in graphhopper.conf atm)
-```
-sudo mkdir -p /var/simra/pbf
-```
-```
-sudo wget https://download.geofabrik.de/europe/germany/berlin-latest.osm.pbf -P /var/simra/pbf/
-```
-```
-sudo wget https://download.geofabrik.de/europe/dach-latest.osm.pbf -P /var/simra/pbf/
-```
-
-3. Install java and start the web server (Error handling in Step 5):
+2. Install java and start the web server (Error handling in Step 5):
 ```
 sudo apt install -y default-jdk
 ```
@@ -179,13 +168,13 @@ sudo apt install -y default-jdk
 sudo java -jar ./graphhopper/graphhopper-web-5.3.jar server ./graphhopper/config.yml
 ```
 
-4. **Make sure the server has completely started before populating the db. This may take a while as it will create a graph inside `graph-cache/`.**
+3. **Make sure the server has completely started before populating the db. This may take a while as it will create a graph inside `graph-cache/`.**
 
-5. If you encounter a Java heap exception, you need to give java more RAM to start the server
+4 (Error handling) If you encounter a Java heap exception, you need to give java more RAM to start the server
 ```
 export JAVA_OPTS="-Xmx10g -Xms10g"  # This gives java a minimum and maximum of 10gigs ram.
 ```
-5.1. Delete the graph-cache/ directory and start the server again.
+5 (Error handling) Delete the graph-cache/ directory and start the server again.
 
 
 ## Initial database population
@@ -201,7 +190,25 @@ sudo wget "https://github.com/omniscale/imposm3/releases/download/v0.10.0/imposm
 tar -xf imposm-0.10.0-linux-x86-64.tar.gz # unpack
 ```
 
-2. Execute Imposm
+2. Download street map data for Berlin and DACH-Region
+```
+sudo mkdir -p /var/simra/pbf
+```
+```
+sudo wget https://download.geofabrik.de/europe/germany/berlin-latest.osm.pbf -P /var/simra/pbf/
+```
+```
+sudo wget https://download.geofabrik.de/europe/dach-latest.osm.pbf -P /var/simra/pbf/
+```
+
+Choose either 3a) or 3b) next according to your needs.
+
+3.a) Execute Imposm small version (will only work for Berlin)
+```
+sudo ./imposm-0.10.0-linux-x86-64/imposm import -mapping mapping.yml -read "/var/simra/pbf/dach-latest.osm.pbf" -overwritecache -write -connection postgis://simra:simra12345simra@localhost/simra
+```
+
+3.b) Execute Imposm large version (will work for the complete DACH-Region)
 ```
 sudo ./imposm-0.10.0-linux-x86-64/imposm import -mapping mapping.yml -read "/var/simra/pbf/berlin-latest.osm.pbf" -overwritecache -write -connection postgis://simra:simra12345simra@localhost/simra
 ```
